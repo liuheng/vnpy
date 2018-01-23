@@ -16,8 +16,8 @@ type_dict = {
 typedefDict.update(type_dict)
 
 
-#----------------------------------------------------------------------
-def replaceTabs(f):
+# ----------------------------------------------------------------------
+def replace_tabs(f):
     """把Tab用4个空格替代"""
     l = []
     for line in f:
@@ -28,7 +28,7 @@ def replaceTabs(f):
 
 def main():
     """主函数"""
-    fcpp = open('xtp_api_struct_common.h', 'r')
+    f_cpp = open('xtp_api_struct_common.h', 'r')
     fpy = open('xtp_struct_common.py', 'w')
 
     fpy.write('# encoding: UTF-8\n')
@@ -36,13 +36,13 @@ def main():
     fpy.write('structDict = {}\n')
     fpy.write('\n')
 
-    lcpp = replaceTabs(fcpp)
-    for n, line in enumerate(lcpp):
-        #print n
+    l_cpp = replace_tabs(f_cpp)
+    for n, line in enumerate(l_cpp):
+        # print n
         # 结构体申明注释
         if '///' in line and '\t' not in line:
             py_line = '#' + line[3:]
-            
+
         if '    //' in line:
             py_line = '#' + line[2:]
 
@@ -54,16 +54,17 @@ def main():
         # 结构体申明
         elif 'struct ' in line:
             content = line.split(' ')
-            name = content[2].replace('\n','')
+            name = content[2].replace('\n', '')
             name = name.replace('\r', '')
             py_line = '%s = {}\n' % name
 
         # 结构体变量
-        elif '    ' == line[0:4] or '\t' == line[0] and '()' not in line and '{' not in line and '}' not in line and '=' not in line:
+        elif '    ' == line[0:4] or '\t' == line[
+            0] and '()' not in line and '{' not in line and '}' not in line and '=' not in line:
             line = line.replace('\t', ' ')
             content = line.split(' ')
             content = [k for k in content if k]
-            
+
             typedef = content[0].replace('\t', '')
             typedef = typedef.replace('()', '')
             typedef = typedef.replace('\r', '')
@@ -77,18 +78,18 @@ def main():
             if '[' in variable:
                 k = variable.index('[')
                 variable = variable[0:k]
-            
+
             py_line = '%s["%s"] = "%s"\n' % (name, variable, type_)
 
         # 结构体结束
         elif '}' in line:
             py_line = "structDict['%s'] = %s\n\n" % (name, name)
-            
-            otherName = line.split(' ')[1]
-            otherName = otherName.replace(';', '')
-            otherName = otherName.replace('\n', '')
-            otherName = otherName.replace('\r', '')
-            second_line = "structDict['%s'] = %s\n\n" % (otherName, name)
+
+            other_name = line.split(' ')[1]
+            other_name = other_name.replace(';', '')
+            other_name = other_name.replace('\n', '')
+            other_name = other_name.replace('\r', '')
+            second_line = "structDict['%s'] = %s\n\n" % (other_name, name)
             py_line = py_line + second_line
 
         # 结构体开始
